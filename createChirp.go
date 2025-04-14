@@ -7,15 +7,14 @@ import (
 	"strings"
 	"unicode"
 
+	"github.com/bmkersey/go-chirpy/internal/auth"
 	"github.com/bmkersey/go-chirpy/internal/database"
-	"github.com/google/uuid"
 )
 
 
 func (c *apiConfig) handlerCreateChirp(w http.ResponseWriter, r *http.Request) {
 	type parameters struct {
 		Body   string    `json:"body"`
-		UserID uuid.UUID `json:"user_id"`
 	}
 
 	decoder := json.NewDecoder(r.Body)
@@ -25,6 +24,19 @@ func (c *apiConfig) handlerCreateChirp(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Error decoding params: %s", err)
 		sendError(w, 400, "Something went wrong")
 		return 
+	}
+
+	token,err := auth.GetBearerToken(r.Header)
+	if err != nil {
+		log.Printf("Error getting Bearer token: %s", err)
+		sendError(w, 401, "Could not verify user")
+		return
+	}
+	tokenID, err := auth.ValidateJWT(token, c.jwtSecret)
+	if err != nil {
+		log.Printf("Error validating token: %s", err)
+		sendError(w, 401, "Could not verify user")
+		return
 	}
 
 	if len(params.Body) > 140 {
@@ -37,7 +49,7 @@ func (c *apiConfig) handlerCreateChirp(w http.ResponseWriter, r *http.Request) {
 
 	chirp, err := c.dbQueries.CreateChirp(r.Context(), database.CreateChirpParams{
 		Body:   params.Body,
-		UserID: params.UserID,
+		UserID: tokenID,
 	})
 	if err != nil {
 		log.Printf("Error creating chirp: %s", err)
