@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"strings"
-	"unicode"
 )
 
 
@@ -44,20 +42,3 @@ func (cfg *apiConfig) handlerValidateChirp(w http.ResponseWriter, r *http.Reques
 	sendJsonResponse(w, 200, respBody)
 }
 
-func removeProfanity(unclean string) string {
-	split := strings.Split(unclean, " ")
-	forbidden := map[string]bool{"kerfuffle": true, "sharbert": true, "fornax": true}
-	for i,word := range split {
-		var cleaned strings.Builder
-    for _, char := range word {
-      if unicode.IsLetter(char) || unicode.IsDigit(char) {
-        cleaned.WriteRune(char)
-      }
-    }
-		if _, ok := forbidden[strings.ToLower(cleaned.String())]; ok {
-			split[i] = "****"
-		}
-	}
-	
-	return strings.Join(split, " ")
-}
