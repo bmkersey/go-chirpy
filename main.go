@@ -44,14 +44,18 @@ func main() {
 	serverMux.Handle("/app/", apiCfg.middlewareMetricsInc(http.StripPrefix("/app", fileServer)))
 
 	serverMux.HandleFunc("GET /api/healthz", healthHandler)
-	serverMux.HandleFunc("POST /api/validate_chirp", apiCfg.handlerValidateChirp)
-	serverMux.HandleFunc("POST /api/users", apiCfg.handlerCreateUser)
-	serverMux.HandleFunc("POST /api/chirps", apiCfg.handlerCreateChirp)
-	serverMux.HandleFunc("GET /api/chirps", apiCfg.handlerGetAllChirps)
-	serverMux.HandleFunc("GET /api/chirps/{chirpID}", apiCfg.handlerGetSingleChirp)
 	serverMux.HandleFunc("POST /api/login", apiCfg.handlerLogin)
 	serverMux.HandleFunc("POST /api/refresh", apiCfg.handlerRefreshToken)
 	serverMux.HandleFunc("POST /api/revoke", apiCfg.handlerRevokeRefreshToken)
+
+	serverMux.HandleFunc("GET /api/chirps", apiCfg.handlerGetAllChirps)
+	serverMux.HandleFunc("POST /api/chirps", apiCfg.handlerCreateChirp)
+	serverMux.HandleFunc("POST /api/validate_chirp", apiCfg.handlerValidateChirp)
+	serverMux.HandleFunc("GET /api/chirps/{chirpID}", apiCfg.handlerGetSingleChirp)
+	serverMux.HandleFunc("DELETE /api/chirps/{chirpID}", apiCfg.handlerDeleteChirp)
+
+	serverMux.HandleFunc("POST /api/users", apiCfg.handlerCreateUser)
+	serverMux.HandleFunc("PUT /api/users", apiCfg.handlerUpdateUser)
 
 	serverMux.HandleFunc("GET /admin/metrics", apiCfg.handlerMetrics)
 	serverMux.HandleFunc("POST /admin/reset", apiCfg.handlerReset)
