@@ -56,9 +56,10 @@ func (c *apiConfig) handlerUpdateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	sendJsonResponse(w, 200, User{
-		ID:        updatedUser.ID,
-		Email:     updatedUser.Email,
-		CreatedAt: updatedUser.CreatedAt,
-		UpdatedAt: updatedUser.UpdatedAt,
+		ID:          updatedUser.ID,
+		Email:       updatedUser.Email,
+		CreatedAt:   updatedUser.CreatedAt,
+		UpdatedAt:   updatedUser.UpdatedAt,
+		IsChirpyRed: updatedUser.IsChirpyRed.Bool,
 	})
 }

@@ -9,10 +9,9 @@ import (
 	"github.com/bmkersey/go-chirpy/internal/database"
 )
 
-
-func(c *apiConfig)handlerCreateUser(w http.ResponseWriter, r *http.Request){
+func (c *apiConfig) handlerCreateUser(w http.ResponseWriter, r *http.Request) {
 	type Paramerters struct {
-		Email string `json:"email"`
+		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
 
@@ -22,31 +21,32 @@ func(c *apiConfig)handlerCreateUser(w http.ResponseWriter, r *http.Request){
 	if err != nil {
 		log.Printf("Error decoding parameters: %s", err)
 		sendError(w, 400, "Something went wrong")
-		return 
+		return
 	}
 
 	hashedPw, err := auth.HashPassword(params.Password)
 	if err != nil {
 		log.Printf("Error hashing password: %s", err)
 		sendError(w, 400, "Something went wrong")
-		return 
+		return
 	}
 
 	user, err := c.dbQueries.CreateUser(r.Context(), database.CreateUserParams{
-		Email: params.Email,
+		Email:          params.Email,
 		HashedPassword: hashedPw,
 	})
 	if err != nil {
 		log.Printf("Error creating user: %s", err)
 		sendError(w, 400, "Something went wrong while creating user")
-		return 
+		return
 	}
 
 	newUser := User{
-		ID: user.ID,
-		CreatedAt: user.CreatedAt,
-		UpdatedAt: user.UpdatedAt,
-		Email: user.Email,
+		ID:          user.ID,
+		CreatedAt:   user.CreatedAt,
+		UpdatedAt:   user.UpdatedAt,
+		Email:       user.Email,
+		IsChirpyRed: user.IsChirpyRed.Bool,
 	}
 
 	sendJsonResponse(w, 201, newUser)

@@ -88,3 +88,12 @@ func MakeRefreshToken() (string, error) {
 
 	return stringToken, nil
 }
+
+func GetAPIKey(headers http.Header) (string, error) {
+	authHeader := headers.Get("Authorization")
+	if len(authHeader) < 1 {
+		return "", fmt.Errorf("no authorization header found: %v", authHeader)
+	}
+	authHeader = strings.TrimSpace(strings.Replace(authHeader, "ApiKey", "", -1))
+	return authHeader, nil
+}
