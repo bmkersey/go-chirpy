@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -54,9 +53,8 @@ func TestCheckPasswordHash_Invalid(t *testing.T) {
 func TestJWTCreationAndValidation(t *testing.T) {
 	userID := uuid.New()
 	tokenSecret := "test-secret-key"
-	expiresIn := time.Hour
 
-	token, err := MakeJWT(userID, tokenSecret, expiresIn)
+	token, err := MakeJWT(userID, tokenSecret)
 	if err != nil {
 		t.Fatalf("Failed to create JWT: %v", err)
 	}
@@ -76,9 +74,8 @@ func TestJWTCreationAndValidation(t *testing.T) {
 func TestJWTExpiration(t *testing.T) {
 	userID := uuid.New()
 	tokenSecret := "test-secret-key"
-	expiresIn := -time.Hour 
 
-	token, err := MakeJWT(userID, tokenSecret, expiresIn)
+	token, err := MakeJWT(userID, tokenSecret)
 	if err != nil {
 		t.Fatalf("Failed to create JWT: %v", err)
 	}
@@ -93,9 +90,8 @@ func TestJWTInvalidSecret(t *testing.T) {
 	userID := uuid.New()
 	tokenSecret := "test-secret-key"
 	wrongSecret := "wrong-secret-key"
-	expiresIn := time.Hour
 
-	token, err := MakeJWT(userID, tokenSecret, expiresIn)
+	token, err := MakeJWT(userID, tokenSecret)
 	if err != nil {
 		t.Fatalf("Failed to create JWT: %v", err)
 	}
@@ -116,9 +112,8 @@ func TestJWTInvalidFormat(t *testing.T) {
 func TestJWTManuallyTampered(t *testing.T) {
 	userID := uuid.New()
 	tokenSecret := "test-secret-key"
-	expiresIn := time.Hour
 
-	token, err := MakeJWT(userID, tokenSecret, expiresIn)
+	token, err := MakeJWT(userID, tokenSecret)
 	if err != nil {
 		t.Fatalf("Failed to create JWT: %v", err)
 	}
@@ -137,9 +132,9 @@ func TestJWTManuallyTampered(t *testing.T) {
 		}
 		parts[1] = string(chars)
 	}
-	
+
 	tamperedToken := strings.Join(parts, ".")
-	
+
 	_, err = ValidateJWT(tamperedToken, tokenSecret)
 	if err == nil {
 		t.Fatal("Expected error for tampered token, got none")

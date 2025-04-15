@@ -14,13 +14,12 @@ import (
 
 type apiConfig struct {
 	fileserverHits atomic.Int32
-	dbQueries *database.Queries
-	platform string
-	jwtSecret string
+	dbQueries      *database.Queries
+	platform       string
+	jwtSecret      string
 }
 
-
-func main(){
+func main() {
 	godotenv.Load()
 	dbURL := os.Getenv("DB_URL")
 	db, err := sql.Open("postgres", dbURL)
@@ -35,9 +34,9 @@ func main(){
 
 	apiCfg := apiConfig{
 		fileserverHits: atomic.Int32{},
-		dbQueries: dbQueries,
-		platform: platform, 
-		jwtSecret: jwtSecret,
+		dbQueries:      dbQueries,
+		platform:       platform,
+		jwtSecret:      jwtSecret,
 	}
 
 	serverMux := http.NewServeMux()
@@ -51,17 +50,17 @@ func main(){
 	serverMux.HandleFunc("GET /api/chirps", apiCfg.handlerGetAllChirps)
 	serverMux.HandleFunc("GET /api/chirps/{chirpID}", apiCfg.handlerGetSingleChirp)
 	serverMux.HandleFunc("POST /api/login", apiCfg.handlerLogin)
+	serverMux.HandleFunc("POST /api/refresh", apiCfg.handlerRefreshToken)
+	serverMux.HandleFunc("POST /api/revoke", apiCfg.handlerRevokeRefreshToken)
 
 	serverMux.HandleFunc("GET /admin/metrics", apiCfg.handlerMetrics)
 	serverMux.HandleFunc("POST /admin/reset", apiCfg.handlerReset)
 
 	server := &http.Server{
-		Addr: ":8080",
+		Addr:    ":8080",
 		Handler: serverMux,
 	}
 
 	server.ListenAndServe()
 
 }
-
-
